@@ -23,6 +23,9 @@ endif()
 
 add_library(client STATIC ${sources})
 
+# the client records audio to send it to the server
+target_link_libraries(client audio)
+
 if (UNIX)
     target_link_libraries(client synlib io)
 endif()

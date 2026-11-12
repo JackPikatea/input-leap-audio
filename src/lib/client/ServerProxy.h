@@ -30,6 +30,7 @@ namespace inputleap {
 class Client;
 class ClientInfo;
 class IStream;
+struct AudioChunk;
 
 //! Proxy for server
 /*!
@@ -59,6 +60,9 @@ public:
 
     // sending dragging information to server
     void sendDragInfo(std::uint32_t fileCount, const char* info, size_t size);
+
+    // sending a piece of captured audio to server
+    void send_audio(const AudioChunk& chunk);
 
 #ifdef INPUTLEAP_TEST_ENV
     void handleDataForTest() { handleData(Event(), nullptr); }

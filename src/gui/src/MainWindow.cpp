@@ -699,6 +699,10 @@ bool MainWindow::clientArgs(QStringList& args, QString& app)
         args << "--log" << appConfig().logFilenameCmd();
     }
 
+    if (appConfig().getStreamAudio()) {
+        args << "--stream-audio";
+    }
+
     // check auto config first, if it is disabled or no server detected,
     // use line edit host name if it is not empty
     if (ui_->m_pCheckBoxAutoConfig->isChecked()) {

@@ -283,6 +283,11 @@ enum class EventType : std::uint32_t {
     /// This event is a keepalive event.
     FILE_KEEPALIVE,
 
+    /** This event is sent by the audio capture thread whenever a piece of captured audio is ready
+        to be sent to the server. The data is an instance of AudioChunk.
+    */
+    AUDIO_CHUNK_SENDING,
+
     /// The total number of known event types.
     EVENT_COUNT,
 };

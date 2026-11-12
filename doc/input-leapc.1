@@ -4,7 +4,7 @@
 input-leapc \- InputLeap Keyboard/Mouse Client
 .SH SYNOPSIS
 .B input-leapc
-[\fI\,--yscroll <delta>\/\fR] [\fI\,--display <display>\/\fR] [\fI\,--daemon|--no-daemon\/\fR] [\fI\,--name <screen-name>\/\fR] [\fI\,--restart|--no-restart\/\fR] [\fI\,--debug <level>\/\fR] \fI\,<server-address>\/\fR
+[\fI\,--yscroll <delta>\/\fR] [\fI\,--stream-audio\/\fR] [\fI\,--display <display>\/\fR] [\fI\,--daemon|--no-daemon\/\fR] [\fI\,--name <screen-name>\/\fR] [\fI\,--restart|--no-restart\/\fR] [\fI\,--debug <level>\/\fR] \fI\,<server-address>\/\fR
 .SH DESCRIPTION
 Start the InputLeap client and connect to a remote server component.
 .SH OPTIONS
@@ -47,6 +47,10 @@ run as a daemon. (*)
 \fB\-\-yscroll\fR <delta>
 defines the vertical scrolling delta, which is
 120 by default.
+.TP
+\fB\-\-stream\-audio\fR
+send the sound that this computer plays to the
+server, which plays it on its speakers.
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 display this help and exit.

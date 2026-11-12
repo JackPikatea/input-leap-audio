@@ -29,6 +29,9 @@
 #include "net/Fwd.h"
 #include "net/NetworkAddress.h"
 #include "base/EventTypes.h"
+#include "audio/AudioCapture.h"
+
+#include <memory>
 
 namespace inputleap {
 
@@ -184,6 +187,9 @@ private:
     void handle_file_chunk_sending(const Event& event);
     void handle_file_receive_completed(const Event&);
     void handle_stop_retry();
+    void handle_audio_chunk_sending(const Event& event);
+    void start_audio_capture();
+    void stop_audio_capture();
     void onFileReceiveCompleted();
     void sendClipboardThread(void*);
 
@@ -217,6 +223,11 @@ private:
     ClientArgs m_args;
     bool m_enableClipboard;
     size_t m_maximumClipboardSize;
+
+    // Records this computer's sound while we're connected, if the user asked for that.
+    std::unique_ptr<AudioCapture> m_audioCapture;
+    // Whether the server we're connected to knows what to do with audio messages.
+    bool m_serverSupportsAudio = false;
 };
 
 } // namespace inputleap

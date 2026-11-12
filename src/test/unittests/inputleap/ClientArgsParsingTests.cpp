@@ -53,6 +53,36 @@ TEST(ClientArgsParsingTests, parseClientArgs_yScrollArg_setYScroll)
     EXPECT_EQ(1, clientArgs.m_yscroll);
 }
 
+TEST(ClientArgsParsingTests, parseClientArgs_streamAudioArg_setStreamAudio)
+{
+    NiceMock<MockArgParser> argParser;
+    ON_CALL(argParser, parseGenericArgs(_, _, _)).WillByDefault(Invoke(client_stubParseGenericArgs));
+    ON_CALL(argParser, checkUnexpectedArgs()).WillByDefault(Invoke(client_stubCheckUnexpectedArgs));
+    ClientArgs clientArgs;
+    const int argc = 3;
+    const char* kStreamAudioCmd[argc] = { "stub", "--stream-audio", "mock_address" };
+
+    bool result = argParser.parseClientArgs(clientArgs, argc, kStreamAudioCmd);
+
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(clientArgs.m_streamAudio);
+    EXPECT_EQ("mock_address", clientArgs.network_address);
+}
+
+TEST(ClientArgsParsingTests, parseClientArgs_noStreamAudioArg_streamAudioOff)
+{
+    NiceMock<MockArgParser> argParser;
+    ON_CALL(argParser, parseGenericArgs(_, _, _)).WillByDefault(Invoke(client_stubParseGenericArgs));
+    ON_CALL(argParser, checkUnexpectedArgs()).WillByDefault(Invoke(client_stubCheckUnexpectedArgs));
+    ClientArgs clientArgs;
+    const int argc = 2;
+    const char* kAddressCmd[argc] = { "stub", "mock_address" };
+
+    argParser.parseClientArgs(clientArgs, argc, kAddressCmd);
+
+    EXPECT_FALSE(clientArgs.m_streamAudio);
+}
+
 TEST(ClientArgsParsingTests, parseClientArgs_addressArg_set_listen_address)
 {
     NiceMock<MockArgParser> argParser;

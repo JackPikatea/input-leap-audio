@@ -160,6 +160,7 @@ void AppConfig::loadSettings()
     m_CryptoEnabled = settings().value("cryptoEnabled", true).toBool();
     // TODO: set default value of requireClientCertificate to true on InputLeap 3.0.0
     m_RequireClientCertificate = settings().value("requireClientCertificate", false).toBool();
+    m_StreamAudio = settings().value("streamAudio", false).toBool();
     m_AutoHide = settings().value("autoHide", false).toBool();
     m_AutoStart = settings().value("autoStart", false).toBool();
     m_MinimizeToTray = settings().value("minimizeToTray", false).toBool();
@@ -184,6 +185,7 @@ void AppConfig::saveSettings()
     settings().setValue("autoConfigPrompted", m_AutoConfigPrompted);
     settings().setValue("cryptoEnabled", m_CryptoEnabled);
     settings().setValue("requireClientCertificate", m_RequireClientCertificate);
+    settings().setValue("streamAudio", m_StreamAudio);
     settings().setValue("autoHide", m_AutoHide);
     settings().setValue("autoStart", m_AutoStart);
     settings().setValue("minimizeToTray", m_MinimizeToTray);
@@ -231,6 +233,10 @@ bool AppConfig::getCryptoEnabled() const { return m_CryptoEnabled; }
 void AppConfig::setRequireClientCertificate(bool e) { m_RequireClientCertificate = e; }
 
 bool AppConfig::getRequireClientCertificate() const { return m_RequireClientCertificate; }
+
+void AppConfig::setStreamAudio(bool e) { m_StreamAudio = e; }
+
+bool AppConfig::getStreamAudio() const { return m_StreamAudio; }
 
 void AppConfig::setAutoHide(bool b) { m_AutoHide = b; }
 

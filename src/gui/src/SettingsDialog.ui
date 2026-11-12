@@ -202,6 +202,16 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QCheckBox" name="checkbox_stream_audio">
+        <property name="toolTip">
+         <string>When this computer is a client, the sound it plays is also sent to the server and played there. The server needs a version of InputLeap that supports this.</string>
+        </property>
+        <property name="text">
+         <string>Send this computer's audio to the server (client only)</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -48,6 +48,7 @@ const char*                kMsgDInfo            = "DINF%2i%2i%2i%2i%2i%2i%2i";
 const char*                kMsgDSetOptions        = "DSOP%4I";
 const char*                kMsgDFileTransfer    = "DFTR%1i%s";
 const char*                kMsgDDragInfo        = "DDRG%2i%s";
+const char*                kMsgDAudio            = "DAUD%4i%1i%s";
 const char*                kMsgQInfo            = "QINF";
 const char*                kMsgEIncompatible    = "EICV%2i%2i";
 const char*                kMsgEBusy             = "EBSY";

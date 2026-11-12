@@ -183,6 +183,9 @@ void ClientProxyUnknown::handle_data()
             if (major == 1) {
                 switch (minor) {
                 case 6:
+                case 7:
+                    // The only thing 1.7 adds is an audio message that the client may send.
+                    // ClientProxy1_6 handles that as well, so it serves both versions.
                     m_proxy = new ClientProxy1_6(name, std::move(conn), m_server, m_events);
                     break;
                 default:

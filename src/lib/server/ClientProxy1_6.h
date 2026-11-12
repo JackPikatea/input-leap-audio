@@ -19,16 +19,19 @@
 #pragma once
 
 #include "server/ClientProxy.h"
+#include "audio/AudioPlayer.h"
 #include "base/Fwd.h"
 #include "inputleap/Clipboard.h"
 #include "inputleap/protocol_types.h"
+
+#include <memory>
 
 namespace inputleap {
 
 class Server;
 class IStream;
 
-//! Proxy for client implementing protocol version 1.0
+//! Proxy for client implementing protocol versions 1.6 and 1.7
 class ClientProxy1_6 : public ClientProxy {
 public:
     ClientProxy1_6(const std::string& name, std::unique_ptr<IClientConnection> backend,
@@ -93,6 +96,7 @@ private:
 
     bool recvInfo();
     bool recvGrabClipboard();
+    bool recvAudio();
 
 protected:
     struct ClientClipboard {
@@ -119,6 +123,11 @@ protected:
     double m_keepAliveRate;
     EventQueueTimer* m_keepAliveTimer;
     Server* m_server;
+
+    // Plays the audio this client sends us. Created when the first audio arrives.
+    std::unique_ptr<AudioPlayer> m_audioPlayer;
+    // Set when we couldn't open a sound device, so that we don't retry for every message.
+    bool m_audioFailed = false;
 };
 
 } // namespace inputleap

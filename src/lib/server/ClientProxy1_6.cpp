@@ -19,6 +19,7 @@
 #include "server/ClientProxy1_6.h"
 #include "ClientConnectionByStream.h"
 
+#include "audio/AudioFormat.h"
 #include "inputleap/ProtocolUtil.h"
 #include "inputleap/ClipboardChunk.h"
 #include "inputleap/Exceptions.h"
@@ -82,6 +83,9 @@ IStream* ClientProxy1_6::getStream() const
 
 void ClientProxy1_6::disconnect()
 {
+    // stop playing the client's audio
+    m_audioPlayer.reset();
+
     remove_handlers();
     get_conn().close();
     m_events->add_event(EventType::CLIENT_PROXY_DISCONNECTED, get_event_target());
@@ -242,6 +246,9 @@ bool ClientProxy1_6::parseMessage(const std::uint8_t* code)
     }
     else if (memcmp(code, kMsgDClipboard, 4) == 0) {
         return recvClipboard();
+    }
+    else if (memcmp(code, kMsgDAudio, 4) == 0) {
+        return recvAudio();
     }
     return false;
 }
@@ -503,6 +510,48 @@ bool ClientProxy1_6::recvGrabClipboard()
     m_events->add_event(EventType::CLIPBOARD_GRABBED, get_event_target(),
                         create_event_data<ClipboardInfo>(info));
 
+    return true;
+}
+
+bool ClientProxy1_6::recvAudio()
+{
+    // parse message
+    std::uint32_t sample_rate = 0;
+    std::uint8_t channels = 0;
+    std::string data;
+    if (!ProtocolUtil::readf(getStream(), kMsgDAudio + 4, &sample_rate, &channels, &data)) {
+        return false;
+    }
+
+    // validate.  the data must consist of whole frames of 2 byte samples.
+    if (sample_rate < kAudioMinSampleRate || sample_rate > kAudioMaxSampleRate ||
+        channels == 0 || channels > kAudioMaxChannels ||
+        data.size() % (2 * channels) != 0) {
+        return false;
+    }
+
+    if (m_audioFailed) {
+        // we have no way to play it, so just discard it
+        return true;
+    }
+
+    // open the sound device when the first audio arrives or when the format changes
+    if (!m_audioPlayer || m_audioPlayer->sample_rate() != sample_rate ||
+        m_audioPlayer->channels() != channels) {
+        m_audioPlayer = std::make_unique<AudioPlayer>();
+
+        std::string error;
+        if (!m_audioPlayer->start(sample_rate, channels, error)) {
+            LOG_WARN("can't play audio from client \"%s\": %s", getName().c_str(), error.c_str());
+            m_audioPlayer.reset();
+            m_audioFailed = true;
+            return true;
+        }
+        LOG_NOTE("playing audio from client \"%s\" (%d Hz, %d channels)", getName().c_str(),
+                 sample_rate, channels);
+    }
+
+    m_audioPlayer->push(data);
     return true;
 }
 

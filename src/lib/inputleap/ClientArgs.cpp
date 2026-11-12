@@ -20,7 +20,8 @@
 namespace inputleap {
 
 ClientArgs::ClientArgs() :
-    m_yscroll(0)
+    m_yscroll(0),
+    m_streamAudio(false)
 {
 }
 

@@ -1,0 +1,1 @@
+Added an option for the client to send the sound it plays to the server (`--stream-audio`, or "Send this computer's audio to the server" in the GUI settings), so that one set of speakers or headphones on the server can be used for both computers. Both sides need a version that supports protocol 1.7.

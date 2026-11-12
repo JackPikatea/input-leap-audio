@@ -19,6 +19,7 @@
 #include "client/ServerProxy.h"
 
 #include "client/Client.h"
+#include "audio/AudioFormat.h"
 #include "inputleap/FileChunk.h"
 #include "inputleap/ClipboardChunk.h"
 #include "inputleap/StreamChunker.h"
@@ -907,6 +908,11 @@ void ServerProxy::sendDragInfo(std::uint32_t fileCount, const char* info, size_t
 {
     std::string data(info, size);
     ProtocolUtil::writef(m_stream, kMsgDDragInfo, fileCount, &data);
+}
+
+void ServerProxy::send_audio(const AudioChunk& chunk)
+{
+    ProtocolUtil::writef(m_stream, kMsgDAudio, chunk.sample_rate, chunk.channels, &chunk.data);
 }
 
 } // namespace inputleap

@@ -55,6 +55,7 @@ SettingsDialog::SettingsDialog(QWidget* parent, AppConfig& config) :
     ui_->m_pCheckBoxMinimizeToTray->setChecked(app_config_.getMinimizeToTray());
     ui_->m_pCheckBoxEnableCrypto->setChecked(app_config_.getCryptoEnabled());
     ui_->checkbox_require_client_certificate->setChecked(app_config_.getRequireClientCertificate());
+    ui_->checkbox_stream_audio->setChecked(app_config_.getStreamAudio());
 
 #if defined(Q_OS_WIN)
     ui_->m_pComboElevate->setCurrentIndex(static_cast<int>(app_config_.elevateMode()));
@@ -82,6 +83,7 @@ void SettingsDialog::accept()
     app_config_.setNetworkInterface(ui_->m_pLineEditInterface->text());
     app_config_.setCryptoEnabled(ui_->m_pCheckBoxEnableCrypto->isChecked());
     app_config_.setRequireClientCertificate(ui_->checkbox_require_client_certificate->isChecked());
+    app_config_.setStreamAudio(ui_->checkbox_stream_audio->isChecked());
     app_config_.setLogLevel(ui_->m_pComboLogLevel->currentIndex());
     app_config_.setLogToFile(ui_->m_pCheckBoxLogToFile->isChecked());
     app_config_.setLogFilename(ui_->m_pLineEditLogFilename->text());

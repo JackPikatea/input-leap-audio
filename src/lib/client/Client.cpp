@@ -88,6 +88,11 @@ Client::Client(IEventQueue* events, const std::string& name, const NetworkAddres
         m_events->add_handler(EventType::FILE_RECEIVE_COMPLETED, this,
                               [this](const auto& e){ handle_file_receive_completed(e); });
     }
+
+    if (m_args.m_streamAudio) {
+        m_events->add_handler(EventType::AUDIO_CHUNK_SENDING, this,
+                              [this](const auto& e){ handle_audio_chunk_sending(e); });
+    }
 }
 
 Client::~Client()
@@ -184,6 +189,7 @@ Client::handshakeComplete()
 {
     m_ready = true;
     m_screen->enable();
+    start_audio_capture();
     send_event(EventType::CLIENT_CONNECTED);
 }
 
@@ -520,6 +526,9 @@ Client::cleanupConnection()
 void
 Client::cleanupScreen()
 {
+    // there's nobody to send audio to anymore
+    stop_audio_capture();
+
     if (m_server != nullptr) {
         if (m_ready) {
             m_screen->disable();
@@ -645,18 +654,27 @@ void Client::handle_hello()
     // check versions
     LOG_DEBUG1("got hello version %d.%d", major, minor);
     if (major < kProtocolMajorVersion ||
-        (major == kProtocolMajorVersion && minor < kProtocolMinorVersion)) {
+        (major == kProtocolMajorVersion && minor < kProtocolMinorVersionMinimum)) {
         sendConnectionFailedEvent(XIncompatibleClient(major, minor).what());
         cleanupTimer();
         cleanupConnection();
         return;
     }
 
+    // A server only accepts clients that speak a version it knows. If the server is older
+    // than us then use its version, so that we can still connect to servers that don't have
+    // the newest features.
+    std::int16_t our_minor = kProtocolMinorVersion;
+    if (major == kProtocolMajorVersion && minor < our_minor) {
+        our_minor = minor;
+    }
+    m_serverSupportsAudio = (our_minor >= kProtocolMinorVersionAudio);
+
     // say hello back
-    LOG_DEBUG1("say hello version %d.%d", kProtocolMajorVersion, kProtocolMinorVersion);
+    LOG_DEBUG1("say hello version %d.%d", kProtocolMajorVersion, our_minor);
     ProtocolUtil::writef(m_stream, kMsgHelloBack,
                             kProtocolMajorVersion,
-                            kProtocolMinorVersion, &m_name);
+                            our_minor, &m_name);
 
     // now connected but waiting to complete handshake
     setupScreen();
@@ -712,6 +730,53 @@ Client::onFileReceiveCompleted()
 void Client::handle_stop_retry()
 {
     m_args.m_restartable = false;
+}
+
+void Client::start_audio_capture()
+{
+    if (!m_args.m_streamAudio) {
+        return;
+    }
+    if (!m_serverSupportsAudio) {
+        LOG_WARN("not streaming audio: the server is too old to play it");
+        return;
+    }
+
+    if (!m_audioCapture) {
+        m_audioCapture = std::make_unique<AudioCapture>();
+    }
+
+    // NOTE: The function we pass here is called by the sound card on its own thread. Only the
+    // main thread may write to the network connection, so all we do here is put the audio
+    // into the event queue, which is safe to use from any thread. The main thread picks it up
+    // in handle_audio_chunk_sending(). File transfers hand their data over the same way.
+    std::string error;
+    bool started = m_audioCapture->start([this](AudioChunk&& chunk) {
+        m_events->add_event(EventType::AUDIO_CHUNK_SENDING, this,
+                            create_event_data<AudioChunk>(std::move(chunk)));
+    }, error);
+
+    if (started) {
+        LOG_NOTE("streaming audio to server");
+    } else {
+        LOG_WARN("not streaming audio: %s", error.c_str());
+    }
+}
+
+void Client::stop_audio_capture()
+{
+    if (m_audioCapture) {
+        m_audioCapture->stop();
+    }
+}
+
+void Client::handle_audio_chunk_sending(const Event& event)
+{
+    // audio that was captured just before we got disconnected can still arrive here
+    if (m_server == nullptr || !m_ready) {
+        return;
+    }
+    m_server->send_audio(event.get_data_as<AudioChunk>());
 }
 
 void Client::write_to_drop_dir_thread()

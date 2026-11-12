@@ -115,7 +115,7 @@ ClientApp::help()
     std::ostringstream buffer;
     buffer << "Start the InputLeap client and connect to a remote server component.\n"
            << "\n"
-           << "Usage: " << args().m_exename << " [--yscroll <delta>]"
+           << "Usage: " << args().m_exename << " [--yscroll <delta>] [--stream-audio]"
 #ifdef WINAPI_XWINDOWS
            << " [--use-x11] [--display <display>]"
 #endif
@@ -139,6 +139,8 @@ ClientApp::help()
            << HELP_SYS_INFO
            << "      --yscroll <delta>    defines the vertical scrolling delta, which is\n"
            << "                           120 by default.\n"
+           << "      --stream-audio       send the sound that this computer plays to the\n"
+           << "                           server, which plays it on its speakers.\n"
            << HELP_COMMON_INFO_2
            << "\n"
            << "Default options are marked with a *\n"

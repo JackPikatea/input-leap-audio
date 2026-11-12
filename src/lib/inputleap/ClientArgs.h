@@ -27,6 +27,9 @@ public:
 
 public:
     int m_yscroll;
+
+    /// Whether to send the sound this computer is playing to the server
+    bool m_streamAudio;
 };
 
 } // namespace inputleap

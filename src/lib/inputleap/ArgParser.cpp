@@ -188,6 +188,10 @@ ArgParser::parseClientArgs(ClientArgs& args, int argc, const char* const* argv)
                 // define scroll
                 args.m_yscroll = atoi(optarg);
             }
+            else if (a.shift("--stream-audio")) {
+                // send this computer's audio to the server
+                args.m_streamAudio = true;
+            }
             else if (a.size() == 1) {
                 args.network_address = a.shift();
                 return true;

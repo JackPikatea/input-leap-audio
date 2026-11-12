@@ -23,7 +23,8 @@ endif()
 
 add_library(server STATIC ${sources})
 
-target_link_libraries(server)
+# the server plays audio received from clients
+target_link_libraries(server audio)
 
 if (UNIX)
     target_link_libraries(server synlib)

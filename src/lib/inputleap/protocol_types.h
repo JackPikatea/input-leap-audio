@@ -33,9 +33,17 @@ namespace inputleap {
 // 1.4:  adds crypto support
 // 1.5:  adds file transfer and removes home brew crypto
 // 1.6:  adds clipboard streaming
+// 1.7:  adds audio streaming from secondary to primary
 // NOTE: with new version, InputLeap minor version should increment
 static const std::int16_t kProtocolMajorVersion = 1;
-static const std::int16_t kProtocolMinorVersion = 6;
+static const std::int16_t kProtocolMinorVersion = 7;
+
+// The oldest minor version that we can still talk to. When the two sides of a connection
+// support different versions the client uses the older of the two.
+static const std::int16_t kProtocolMinorVersionMinimum = 6;
+
+// The first minor version in which the primary understands kMsgDAudio
+static const std::int16_t kProtocolMinorVersionAudio = 7;
 
 // default contact port number
 static const std::uint16_t kDefaultPort = 24800;
@@ -282,6 +290,14 @@ extern const char*        kMsgDFileTransfer;
 // the number of dragging objects. Then the following string consists
 // of each object's directory.
 extern const char*        kMsgDDragInfo;
+
+// audio data:  secondary -> primary
+// a short piece of the sound that the secondary screen is playing, for
+// the primary to play on its own speakers.  $1 = sample rate in Hz,
+// $2 = number of channels, $3 = the samples, as signed 16 bit
+// little-endian integers with the channels interleaved.  must not be
+// sent unless the primary supports protocol version 1.7 or newer.
+extern const char*        kMsgDAudio;
 
 //
 // query codes
